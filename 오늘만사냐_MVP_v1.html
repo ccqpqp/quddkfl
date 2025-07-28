@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘만 사냐?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; background: #000; color: #fff; margin: 0; padding: 20px; }
+        h1 { text-align: center; }
+        .section { margin-bottom: 30px; }
+        button, input, textarea {
+            font-size: 16px; padding: 10px; border-radius: 10px; border: none;
+            margin-top: 10px;
+        }
+        .emotion-btns button {
+            background: #333; color: #fff; margin-right: 10px;
+        }
+        #emotion-count { margin-top: 5px; font-size: 14px; color: #aaa; }
+        .log { background: #111; padding: 10px; border-radius: 8px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>오늘만 사냐?</h1>
+
+    <div class="section">
+        <h3>🌅 오늘의 감정</h3>
+        <div class="emotion-btns">
+            <button onclick="addEmotion('😊')">😊 기쁨</button>
+            <button onclick="addEmotion('😢')">😢 슬픔</button>
+            <button onclick="addEmotion('😠')">😠 화남</button>
+            <button onclick="addEmotion('😶')">😶 무덤덤</button>
+        </div>
+        <div id="emotion-count"></div>
+    </div>
+
+    <div class="section">
+        <h3>✍️ 감정 기록</h3>
+        <textarea id="entry" rows="4" cols="40" placeholder="지금 느끼는 걸 적어봐"></textarea><br>
+        <button onclick="saveEntry()">기록하기</button>
+        <div id="log-container"></div>
+    </div>
+
+    <script>
+        let emotions = JSON.parse(localStorage.getItem("emotions") || "[]");
+        let entries = JSON.parse(localStorage.getItem("entries") || "[]");
+
+        function updateEmotionCount() {
+            document.getElementById("emotion-count").innerText = `지금까지 모은 감정알: ${emotions.length}개`;
+        }
+
+        function addEmotion(e) {
+            emotions.push({ emoji: e, time: new Date().toLocaleString() });
+            localStorage.setItem("emotions", JSON.stringify(emotions));
+            updateEmotionCount();
+            alert(`${e} 감정알이 저장됐어!`);
+        }
+
+        function saveEntry() {
+            const val = document.getElementById("entry").value.trim();
+            if (val.length === 0) return alert("뭔가 적어야지!");
+            entries.push({ text: val, time: new Date().toLocaleString() });
+            localStorage.setItem("entries", JSON.stringify(entries));
+            document.getElementById("entry").value = "";
+            loadEntries();
+        }
+
+        function loadEntries() {
+            const box = document.getElementById("log-container");
+            box.innerHTML = "";
+            entries.slice().reverse().forEach(entry => {
+                const div = document.createElement("div");
+                div.className = "log";
+                div.innerHTML = `<b>${entry.time}</b><br>${entry.text}`;
+                box.appendChild(div);
+            });
+        }
+
+        updateEmotionCount();
+        loadEntries();
+    </script>
+</body>
+</html>
